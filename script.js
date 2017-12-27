@@ -1,5 +1,7 @@
 // based on one of my first heavy programming experiences in 2011 with flash and as3 but now in es6 and browser copyright Craig Dempsey
 
+// does git like me?
+
 let status = $('.status');
 // status.text("has jquery");
 
