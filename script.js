@@ -7,7 +7,11 @@ let status = $('.status');
 
 let randomPos = function () {
   return Math.floor(Math.random()*101);  // 100 percent width or height of whatever
-}
+};
+
+let squareNum = function (num) {
+  return Math.pow(num, 2);
+};
 
 let allDots = [];
 let numDots = 10; // make it an even number
@@ -20,24 +24,45 @@ class Dot {
     this.xPos = xPos;
     this.yPos = yPos;
     //NearestNeigbor
-    this.NN = {};
+    // this.NN = {};
     //NextNearestNeighbor
-    this.NNN = {};
-    this.NNxDistance = 0;
-    this.NNyDistance = 0;
-    this.NNNxDistance = 0;
-    this.NNNyDistance = 0;
-    this.NNDistance = 0;
-    this.NNNDistance = 0;
+    // this.NNN = {};
   }
 
   // find Neighbors
-  findNs (allDots) {
+  findNs () {
     // take allDots array and fill in this.NN and this.NNN
-    // this is an algo that needs optimization
-    // Dots have NNxDistance and NNyDistance, etc, to exclude from iteration the Dots that are for sure to far to qualify
+    // console.log ('findNs called');
+    let prevNxDistance = 100;
+    let prevNyDistance = 100;
+    let prevDistanceSquared = squareNum(prevNxDistance) + squareNum(prevNxDistance);
 
-  }
+    allDots.forEach((dot) => {
+      let iNxDistance = Math.abs(this.xPos - dot.xPos);
+      let iNyDistance = Math.abs(this.yPos - dot.yPos);
+      // if it's not me
+      if (iNxDistance !== 0 && iNyDistance !== 0) {
+        // and it's distance is less than prev
+        if (iNxDistance < prevNxDistance || iNyDistance < prevNyDistance) {
+          // console.log('passed second qualification');
+          let iNDistanceSquared = squareNum(iNxDistance) + squareNum(iNyDistance);
+          // and it's closer than prev dot
+          // NaN
+          // console.log(iNDistanceSquared, prevDistanceSquared);
+          if (iNDistanceSquared < prevDistanceSquared) {
+            console.log('passed qualifications');
+            this.NNN = this.NN;
+            this.NN = dot;
+            prevNxDistance = iNxDistance;
+            prevNyDistance = iNyDistance;
+            prevDistanceSquared = iNDistanceSquared;
+          }
+        }
+      }
+
+    });
+
+  } // end findNs
 
   moveTowardTarget () {
     // get the position of NN and NNN and triangulate to move to that position
@@ -76,7 +101,14 @@ class DotMaker {
 let painter = new DotMaker();
 painter.makeAllDots();
 
+////  now we have a bunch of pairs of dots, the following index in the allDots array is the twin of the current index.  we want to find Ns for each Dot in allDots array
+
 console.log(allDots);
+
+// execution that should put NN and NNN in each of the dots
+allDots.forEach((dot) => {
+  dot.findNs();
+});
 
 
 
