@@ -23,10 +23,10 @@ class Dot {
     this.idx = id;
     this.xPos = xPos;
     this.yPos = yPos;
-    //NearestNeigbor
-    // this.NN = {};
-    //NextNearestNeighbor
-    // this.NNN = {};
+    // NearestNeigbor
+    this.NN = {};
+    // NextNearestNeighbor
+    this.NNN = {};
   }
 
   // find Neighbors
@@ -36,30 +36,39 @@ class Dot {
     let prevNxDistance = 100;
     let prevNyDistance = 100;
     let prevDistanceSquared = squareNum(prevNxDistance) + squareNum(prevNxDistance);
+    let NNDistanceSquared = 0;
 
     allDots.forEach((dot) => {
-      let iNxDistance = Math.abs(this.xPos - dot.xPos);
-      let iNyDistance = Math.abs(this.yPos - dot.yPos);
+      let iN = dot;
+      let iNxDistance = Math.abs(this.xPos - iN.xPos);
+      let iNyDistance = Math.abs(this.yPos - iN.yPos);
       // if it's not me
       if (iNxDistance !== 0 && iNyDistance !== 0) {
-        // and it's distance is less than prev
+        // and NN has not ben set, set it
+        if (typeof(this.NN) !== 'Dot') {
+          this.NN = iN;
+        }
+        // also always set NNN to this N
+        this.NNN = iN;
+        // now if both its x and y distances are less than prev, store this N dist^2 and continue
         if (iNxDistance < prevNxDistance || iNyDistance < prevNyDistance) {
           // console.log('passed second qualification');
           let iNDistanceSquared = squareNum(iNxDistance) + squareNum(iNyDistance);
-          // and it's closer than prev dot
-          // NaN
-          // console.log(iNDistanceSquared, prevDistanceSquared);
-          if (iNDistanceSquared < prevDistanceSquared) {
-            console.log('passed qualifications');
-            this.NNN = this.NN;
-            this.NN = dot;
-            prevNxDistance = iNxDistance;
-            prevNyDistance = iNyDistance;
-            prevDistanceSquared = iNDistanceSquared;
+
+          // if it's distance is less than prev and greater than nearest, set it as NNN
+          if (iNDistanceSquared < prevDistanceSquared && iNDistanceSquared > NNDistanceSquared) {
+            this.NNN = iN;
+            // if it's closer than prev dot, set NNN to NN, NN to dot, and reset qualifiers
+            if (iNDistanceSquared < prevDistanceSquared) {
+              this.NNN = this.NN;
+              this.NN = iN;
+              prevNxDistance = iNxDistance;
+              prevNyDistance = iNyDistance;
+              prevDistanceSquared = iNDistanceSquared;
+            }
           }
         }
       }
-
     });
 
   } // end findNs
@@ -93,22 +102,28 @@ class DotMaker {
       this.placeTwinDots(iterator);
       iterator--;
     }
+    allDots.forEach((dot) => {
+      dot.findNs();
+    });
   }
 
 } // end DotMaker class
 
+function paint () {
+  let painter = new DotMaker();
+  painter.makeAllDots();
+  // execution that puts NN and NNN in each of the dots
+  console.log(allDots);
+}
 
-let painter = new DotMaker();
-painter.makeAllDots();
+paint();
 
-////  now we have a bunch of pairs of dots, the following index in the allDots array is the twin of the current index.  we want to find Ns for each Dot in allDots array
+function testIfAnyDotsHaveThemselvesAsNs () {
+  allDots.forEach((dot) => {
+    if (dot.NN === dot || dot.NNN === dot) {
+      console.log('self as neighbor');
+    }
+  });
+}
 
-console.log(allDots);
-
-// execution that should put NN and NNN in each of the dots
-allDots.forEach((dot) => {
-  dot.findNs();
-});
-
-
-
+testIfAnyDotsHaveThemselvesAsNs();
