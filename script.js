@@ -14,11 +14,12 @@ let squareNum = function (num) {
 };
 
 let allDots = [];
-let numDots = 10; // make it an even number
+let numD = 10; // make it an even number
 let moveAmount = 0.3;
 let numMoves = 20;
 
 class Dot {
+
   constructor( id, xPos, yPos ) {
     this.idx = id;
     this.xPos = xPos;
@@ -35,8 +36,8 @@ class Dot {
     // console.log ('findNs called');
     let prevNxDistance = 100;
     let prevNyDistance = 100;
-    let prevDistanceSquared = squareNum(prevNxDistance) + squareNum(prevNxDistance);
-    let NNDistanceSquared = 0;
+    let prevDistanceSqrd = squareNum(prevNxDistance) + squareNum(prevNxDistance);
+    let NNDistanceSqrd = 0;
 
     allDots.forEach((dot) => {
       let iN = dot;
@@ -44,27 +45,25 @@ class Dot {
       let iNyDistance = Math.abs(this.yPos - iN.yPos);
       // if it's not me
       if (iNxDistance !== 0 && iNyDistance !== 0) {
-        // and NN has not ben set, set it
-        if (typeof(this.NN) !== 'Dot') {
-          this.NN = iN;
+        // and NNN has not ben set, set both
+        if (typeof(this.NNN) !== 'Dot') {
+          this.NNN = iN;
         }
-        // also always set NNN to this N
-        this.NNN = iN;
-        // now if both its x and y distances are less than prev, store this N dist^2 and continue
+        // now if either of its x and y distances are less than prev, store this N dist^2 and continue
         if (iNxDistance < prevNxDistance || iNyDistance < prevNyDistance) {
           // console.log('passed second qualification');
-          let iNDistanceSquared = squareNum(iNxDistance) + squareNum(iNyDistance);
+          let iNDistanceSqrd = squareNum(iNxDistance) + squareNum(iNyDistance);
 
           // if it's distance is less than prev and greater than nearest, set it as NNN
-          if (iNDistanceSquared < prevDistanceSquared && iNDistanceSquared > NNDistanceSquared) {
+          if (iNDistanceSqrd < prevDistanceSqrd && iNDistanceSqrd > NNDistanceSqrd) {
             this.NNN = iN;
-            // if it's closer than prev dot, set NNN to NN, NN to dot, and reset qualifiers
-            if (iNDistanceSquared < prevDistanceSquared) {
+            // if it's closer than NN, set NNN to NN, NN to dot, and reset qualifiers
+            if (iNDistanceSqrd < prevDistanceSqrd) {
               this.NNN = this.NN;
               this.NN = iN;
               prevNxDistance = iNxDistance;
               prevNyDistance = iNyDistance;
-              prevDistanceSquared = iNDistanceSquared;
+              prevDistanceSqrd = iNDistanceSqrd;
             }
           }
         }
@@ -96,8 +95,8 @@ class DotMaker {
     allDots.push(dotTwin);
   }
 
-  makeAllDots () {
-    let iterator = numDots / 2;  // why you make it even
+  makeAllDots (evenNum) {
+    let iterator = evenNum / 2;
     while (iterator > 0) {
       this.placeTwinDots(iterator);
       iterator--;
@@ -109,21 +108,29 @@ class DotMaker {
 
 } // end DotMaker class
 
-function paint () {
-  let painter = new DotMaker();
-  painter.makeAllDots();
-  // execution that puts NN and NNN in each of the dots
-  console.log(allDots);
+class Painter {
+  constructor (numDots) {
+    this.numDots = numDots;
+    this.paint();
+  }
+  paint () {
+    let painter = new DotMaker();
+    painter.makeAllDots(this.numDots);
+    // execution that puts NN and NNN in each of the dots
+    console.log(allDots);
+  }
 }
 
-paint();
+let paint10dots = new Painter(numD);
 
-function testIfAnyDotsHaveThemselvesAsNs () {
-  allDots.forEach((dot) => {
-    if (dot.NN === dot || dot.NNN === dot) {
-      console.log('self as neighbor');
-    }
-  });
-}
+/////////////////////////////////////////////////////////////////////////////////////
+// function testIfAnyDotsHaveThemselvesAsNs () {
+//   allDots.forEach((dot) => {
+//     if (dot.NN === dot || dot.NNN === dot) {
+//       console.log('self as neighbor');
+//     }
+//   });
+// }
 
-testIfAnyDotsHaveThemselvesAsNs();
+// testIfAnyDotsHaveThemselvesAsNs();
+/////////////////////////////////////////////////////////////////////////////////////
