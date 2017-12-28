@@ -1,0 +1,21 @@
+.top-container {
+  display: block;
+  width: 90%;
+  height: 90%;
+  margin: 0 auto;
+}
+
+.dot-container {
+  display: block;
+  position: relative;
+  width: 1000px;
+  height: 1000px;
+}
+
+.dot {
+  position: absolute;
+  background: #0b0;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}

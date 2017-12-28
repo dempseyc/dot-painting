@@ -1,12 +1,11 @@
-// based on one of my first heavy programming experiences in 2011 with flash and as3 but now in es6 and browser copyright Craig Dempsey
-
-// does git like me?
+// based on one of my first programming experiences in 2011 with flash and as3 but now in es6 and browser copyright Craig Dempsey
 
 let status = $('.status');
+let dotContainer = $('.dot-container');
 // status.text("has jquery");
 
 let randomPos = function () {
-  return Math.floor(Math.random()*101);  // 100 percent width or height of whatever
+  return Math.floor(Math.random()*1001);
 };
 
 let squareNum = function (num) {
@@ -14,9 +13,9 @@ let squareNum = function (num) {
 };
 
 let allDots = [];
-let numD = 10; // make it an even number
+let numD = 1000; // make it an even number
 let moveAmount = 0.3;
-let numMoves = 20;
+let numMoves = 6;
 
 class Dot {
 
@@ -28,6 +27,8 @@ class Dot {
     this.NN = {};
     // NextNearestNeighbor
     this.NNN = {};
+    this.tx = 0;
+    this.ty = 0;
   }
 
   // find Neighbors
@@ -72,10 +73,25 @@ class Dot {
 
   } // end findNs
 
+  setTarget () {
+    let dot = this;
+    function targetMidPoint () {
+      dot.tx = (dot.NN.xPos + dot.NNN.xPos) / 2 ;
+      dot.ty = (dot.NN.yPos + dot.NNN.yPos) / 2 ;
+    }
+    // targetMidPoint();
+    function targetAverageDist () {
+      // do some trig
+    }
+  }
+
   moveTowardTarget () {
-    // get the position of NN and NNN and triangulate to move to that position
-    // this is where most of the trig lives
-    // app has a moveAmount constant that slowly moves you toward target and recalculates target after every Dot has moved toward their target
+    // app has a moveAmount constant that slowly moves you toward target
+    console.log('move called');
+    this.xPos = this.xPos + (this.tx - this.xPos) * moveAmount;
+    this.yPos = this.yPos + (this.ty - this.yPos) * moveAmount;
+    this.JQ.css({"left": `${this.xPos}%`});
+    this.JQ.css({"top": `${this.yPos}%`});
 
   }
 
@@ -87,7 +103,7 @@ class DotMaker {
     let id = i;
     let id2 = i*2;
     let x = randomPos();
-    let reflectedx = 100 - x;
+    let reflectedx = 1000 - x;
     let y = randomPos();
     let dot = new Dot(id,x,y);
     let dotTwin = new Dot(id2,reflectedx,y);
@@ -111,17 +127,39 @@ class DotMaker {
 class Painter {
   constructor (numDots) {
     this.numDots = numDots;
+    this.draw();
+  }
+  draw () {
+    let dotMaker = new DotMaker();
+    // execution that puts NN and NNN in each of the dots
+    dotMaker.makeAllDots(this.numDots);
     this.paint();
   }
   paint () {
-    let painter = new DotMaker();
-    painter.makeAllDots(this.numDots);
-    // execution that puts NN and NNN in each of the dots
-    console.log(allDots);
+    allDots.forEach((dot) => {
+      let newDot = $('<div class= "dot" >');
+      dot.JQ = newDot;
+      dot.JQ.css({"left": `${dot.xPos}%`});
+      dot.JQ.css({"top": `${dot.yPos}%`});
+      dotContainer.append(dot.JQ);
+    });
+    this.move();
   }
-}
+  move () {
+    for (let i = numMoves; i >=0; i--) {
+      allDots.forEach((dot) => {
+        dot.setTarget();
+        dot.moveTowardTarget();
+        dot.JQ.css({"left": `${dot.xPos}%`});
+        dot.JQ.css({"top": `${dot.yPos}%`});
+      });
+    }
+  }
+} // end class Painter
 
-let paint10dots = new Painter(numD);
+let paintDots = new Painter(numD);
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 // function testIfAnyDotsHaveThemselvesAsNs () {
