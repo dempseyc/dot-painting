@@ -1,21 +1,21 @@
 .top-container {
   display: block;
-  width: 90%;
-  height: 90%;
+  width: 90vw;
+  height: 90vh;
   margin: 0 auto;
 }
 
 .dot-container {
   display: block;
   position: relative;
-  width: 1000px;
-  height: 1000px;
+  width: 90%;
+  height: 90%;
 }
 
 .dot {
   position: absolute;
   background: #0b0;
-  width: 25px;
-  height: 25px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
 }
