@@ -1,21 +1,30 @@
 .top-container {
   display: block;
-  width: 90vw;
-  height: 90vh;
-  margin: 0 auto;
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  margin: 20 auto;
 }
 
 .dot-container {
   display: block;
-  position: relative;
-  width: 90%;
-  height: 90%;
+  position: absolute;
+  width: 80vw;
+  height: 80vh;
+  margin: 0 auto;
 }
 
 .dot {
   position: absolute;
-  background: #0b0;
-  width: 5px;
-  height: 5px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
+}
+
+.green {
+  background: #0b0;
+}
+
+.red {
+  background: #b00;
 }

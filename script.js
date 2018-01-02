@@ -13,9 +13,9 @@ let squareNum = function (num) {
 };
 
 let allDots = [];
-let numD = 800; // make it an even number
+let numD = 2000; // make it an even number
 let moveAmount = 0.2;
-let numMoves = 5;
+let numMoves = 20;
 
 class Dot {
 
@@ -24,55 +24,72 @@ class Dot {
     this.xPos = xPos;
     this.yPos = yPos;
     // NearestNeigbor
-    this.NN = {};
     // NextNearestNeighbor
-    this.NNN = {};
     this.tx = 0;
     this.ty = 0;
+    let newDot = $(`<div id= ${id} class= "dot green" >`).hover(this.onMouseIn, this.onMouseOut);
+    this.JQ = newDot;
+    dotContainer.append(this.JQ);
+  }
+
+  onMouseIn () {
+    console.log(this.id); // returns dom object, not a Dot
+    // console.log("mousein");
+    allDots[this.id].NN.JQ.removeClass('green');
+    allDots[this.id].NN.JQ.addClass('red');
+    allDots[this.id].NNN.JQ.removeClass('green');
+    allDots[this.id].NNN.JQ.addClass('red');
+  }
+
+  onMouseOut () {
+    // console.log("mouseout");
+    allDots[this.id].NN.JQ.removeClass('red');
+    allDots[this.id].NN.JQ.addClass('green');
+    allDots[this.id].NNN.JQ.removeClass('red');
+    allDots[this.id].NNN.JQ.addClass('green');
   }
 
   // find Neighbors
   findNs () {
     // take allDots array and fill in this.NN and this.NNN
-    // console.log ('findNs called');
-    let prevNxDistance = 100;
-    let prevNyDistance = 100;
-    let prevDistanceSqrd = squareNum(prevNxDistance) + squareNum(prevNxDistance);
-    let NNDistanceSqrd = 0;
+    let NNDistanceSqrd = 20164;
+    let NNNDistanceSqrd = 20164;
 
+    // find NN
     allDots.forEach((dot) => {
       let iN = dot;
       let iNxDistance = Math.abs(this.xPos - iN.xPos);
       let iNyDistance = Math.abs(this.yPos - iN.yPos);
       let iNDistanceSqrd = squareNum(iNxDistance) + squareNum(iNyDistance);
       // if it's not me
-      if (iNxDistance !== 0 && iNyDistance !== 0) {
-        // and NNN has not been set, set both to iN
-        if (typeof(this.NNN) !== 'Dot') {
-          this.NNN = iN;
+      if (iNDistanceSqrd !== 0) {
+        // and NNN has not been set, set both
+        if (typeof(this.NNN) == 'undefined') {
+          console.log('should happen once per dot', typeof(this.NNN));
+          this.NNN = this;
           this.NN = iN;
-          // now if either of its x and y distances are less than prev, store distances and continue
-          if (iNxDistance <= prevNxDistance || iNyDistance <= prevNyDistance) {
-            // console.log('passed second qualification');
-            prevDistanceSqrd = squareNum(prevNxDistance) + squareNum(prevNyDistance);
+          NNDistanceSqrd = iNDistanceSqrd;
 
-            // if distance is less than prev and greater than nearest, set it as NNN
-            if (iNDistanceSqrd <= prevDistanceSqrd && iNDistanceSqrd >= NNDistanceSqrd) {
-
-              this.NNN = iN;
-              // prevDistanceSqrd = iNDistanceSqrd;
-
-              // if it's closer than NN, set NNN to NN, NN to dot, and reset qualifiers
-              if (iNDistanceSqrd <= NNDistanceSqrd) {
-                this.NNN = this.NN;
-                this.NN = iN;
-                prevNxDistance = iNxDistance;
-                prevNyDistance = iNyDistance;
-                prevDistanceSqrd = squareNum(prevNxDistance) + squareNum(prevNyDistance);
-                NNDistanceSqrd = iNDistanceSqrd;
-              }
-            }
-          }
+        } else
+        if (iNDistanceSqrd < NNDistanceSqrd) {
+          console.log('passed NN qualification')
+          this.NN = iN;
+          NNDistanceSqrd = iNDistanceSqrd;
+        }
+      }
+    });
+    // find NNN
+    allDots.forEach((dot) => {
+      let iN = dot;
+      let iNxDistance = Math.abs(this.xPos - iN.xPos);
+      let iNyDistance = Math.abs(this.yPos - iN.yPos);
+      let iNDistanceSqrd = squareNum(iNxDistance) + squareNum(iNyDistance);
+      // if it's not me
+      if (iNDistanceSqrd !== 0) {
+        if (NNNDistanceSqrd > iNDistanceSqrd && iNDistanceSqrd > NNDistanceSqrd) {
+          console.log('passed NNN qualification')
+          this.NNN = iN;
+          NNNDistanceSqrd = iNDistanceSqrd;
         }
       }
     });
@@ -81,25 +98,75 @@ class Dot {
 
   setTarget () {
     let dot = this;
-    function targetMidPoint () {
-      // console.log("dot.NN.xpos", dot.NN.xPos);
-      dot.tx = (dot.NNN.xPos - dot.NN.xPos) / 2 ;
-      dot.ty = (dot.NNN.yPos - dot.NN.yPos) / 2 ;
-    }
-    targetMidPoint();
+    // this shrinks the spread, predictably
+    // function targetMidPoint () {
+    //   // console.log("dot.NN.xpos", dot.NN.xPos);
+    //   dot.tx = (dot.NNN.xPos + dot.NN.xPos) * 0.5 ;
+    //   dot.ty = (dot.NNN.yPos + dot.NN.yPos) * 0.5 ;
+    // }
+    // targetMidPoint();
 
-    function targetAverageDist () {
-      // do some trig
+    function targetAverageOfVectors () {
+
+      // midpoint
+      let p1 = {};
+      // target
+      let p2 = {};
+      // from NN to dot
+      let v1 = {};
+      // from NNN to dot
+      let v2 = {};
+      // from p1 to p2
+      let v3 = {};
+
+      let avgMag = 0;
+
+      // function findAverageDistance () {
+      //   let d1 = Math.sqrt(squareNum(dot.xPos-dot.NN.xpos) + squareNum(dot.yPos-dot.NN.ypos));
+      //   let d2 = Math.sqrt(squareNum(dot.xPos-dot.NNN.xpos) + squareNum(dot.yPos-dot.NNN.ypos));
+      //   let d3 = (d1 + d2) * 0.5;
+      //   return d3;
+      // }
+
+      function findMidPoint () {
+        let mx = (dot.NNN.xPos + dot.NN.xPos) * 0.5 ;
+        let my = (dot.NNN.yPos + dot.NN.yPos) * 0.5 ;
+        return { x:mx, y:my };
+      }
+
+      p1 = findMidPoint();
+      // console.log(p1);
+
+      function findTarget () {
+        v1.x = (dot.xPos - dot.NN.xPos) * 0.5;
+        v1.y = (dot.yPos - dot.NN.yPos) * 0.5;
+        v2.x = (dot.xPos - dot.NNN.xPos) * 0.5;
+        v2.y = (dot.yPos - dot.NNN.yPos) * 0.5;
+        v3.x = (v2.x + v1.x) * 0.5;
+        v3.y = (v2.y + v1.y) * 0.5;
+        p2.x = p1.x - v3.x;
+        p2.y = p1.y - v3.y;
+      }
+
+      findTarget();
+      dot.tx = p2.x;
+      dot.ty = p2.y;
     }
+
+    targetAverageOfVectors();
+    // return p2;
+    // console.log(p2);
   }
 
   moveTowardTarget () {
     // app has a moveAmount constant that slowly moves you toward target
     console.log('move called');
-    // this.xPos = this.xPos + (this.tx - this.xPos) * moveAmount;
-    // this.yPos = this.yPos + (this.ty - this.yPos) * moveAmount;
-    this.xPos = this.xPos - (this.xPos + this.tx) * moveAmount;
-    this.yPos = this.yPos - (this.yPos + this.tx) * moveAmount;
+    this.xPos = this.xPos + (this.tx - this.xPos) * moveAmount;
+    this.yPos = this.yPos + (this.ty - this.yPos) * moveAmount;
+
+    //// maybe change these so they return a percentage
+    // this.xPos = this.xPos + (this.xPos - this.tx) * moveAmount;
+    // this.yPos = this.yPos + (this.yPos - this.ty) * moveAmount;
 
     this.JQ.css({"left": `${this.xPos}%`});
     this.JQ.css({"top": `${this.yPos}%`});
@@ -112,7 +179,7 @@ class DotMaker {
 
   placeTwinDots (i) {
     let id = i;
-    let id2 = i*2;
+    let id2 = i+1;
     let x = randomPos();
     let reflectedx = 100 - x;
     let y = randomPos();
@@ -123,10 +190,10 @@ class DotMaker {
   }
 
   makeAllDots (evenNum) {
-    let iterator = evenNum / 2;
-    while (iterator > 0) {
+    let iterator = 0;
+    while (iterator < evenNum) {
       this.placeTwinDots(iterator);
-      iterator--;
+      iterator+=2;
     }
     allDots.forEach((dot) => {
       dot.findNs();
@@ -151,12 +218,10 @@ class Painter {
 
   paint () {
     allDots.forEach((dot) => {
-      let newDot = $('<div class= "dot" >');
-      dot.JQ = newDot;
       dot.JQ.css({"left": `${dot.xPos}%`});
       dot.JQ.css({"top": `${dot.yPos}%`});
-      dotContainer.append(dot.JQ);
     });
+    console.log(allDots);
     this.move();
   }
 
