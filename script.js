@@ -1,4 +1,4 @@
-// based on one of my first programming experiences in 2011 with flash and as3 but now in es6 and browser copyright Craig Dempsey
+// based on one of my first programming experiences in 2011 with flash and as3 but now in JS and browser copyright Craig Dempsey
 
 let status = $('.status');
 let dotContainer = $('.dot-container');
@@ -13,7 +13,7 @@ let squareNum = function (num) {
 };
 
 let allDots = [];
-let numD = 100; // make it an even number
+let numD = 200; // make it an even number
 let moveAmount = 0.2;
 let numMoves = 50;
 
@@ -56,22 +56,23 @@ class Dot {
     let NNNDistanceSqrd = 20164;
 
     // find NN
-    allDots.forEach((dot) => {
+    allDots.forEach((dot, i) => {
       let iN = dot;
       let iNxDistance = Math.abs(this.xPos - iN.xPos);
       let iNyDistance = Math.abs(this.yPos - iN.yPos);
       let iNDistanceSqrd = squareNum(iNxDistance) + squareNum(iNyDistance);
       // if it's not me
-      if (iNDistanceSqrd !== 0) {
+      if (iN.idx !== this.idx) {
         // and NNN has not been set, set both
         if (typeof(this.NNN) == 'undefined') {
           // console.log('should happen once per dot', typeof(this.NNN));
           this.NNN = this;
+          // NNNDistanceSqrd = 0;
           this.NN = iN;
           NNDistanceSqrd = iNDistanceSqrd;
 
-        } else
-        if (iNDistanceSqrd < NNDistanceSqrd) {
+        }
+        if (iNDistanceSqrd <= NNDistanceSqrd) {
           // console.log('passed NN qualification')
           this.NN = iN;
           NNDistanceSqrd = iNDistanceSqrd;
@@ -186,7 +187,7 @@ class Dot {
         v3.xn = v3.x / v3.mag;
         v3.yn = v3.y / v3.mag;
 
-        // v4.mag = Math.sqrt(squareNum(dot.NNN.xPos-dot.NN.xPos)+squareNum(dot.NNN.yPos-dot.NN.yPos));
+        v4.mag = Math.sqrt(squareNum(dot.NNN.xPos-dot.NN.xPos)+squareNum(dot.NNN.yPos-dot.NN.yPos));
         v4.x = v3.xn * v4.mag / 2;
         v4.y = v3.yn * v4.mag / 2;
         p2.x = p1.x + v4.x;
@@ -292,30 +293,25 @@ class Dot {
       // dot.tx = dot.tcx;
       // dot.ty = dot.tcy;
 
-      // hard to believe he's different than tcx
+      // hard to believe he's different than tcx, maybe less gradients and curves, more angles
       // dot.tx = dot.tmx;
       // dot.ty = dot.tmy;
 
       // this should be the original algo
-      dot.tx = dot.tox;
-      dot.ty = dot.toy;
+      // dot.tx = dot.tox;
+      // dot.ty = dot.toy;
 
-      // based on this experiment, there must be multipliers in the x and y dimensions that are
-      // not equanimous
       // dot.tx = (dot.tax*8 + dot.tmx*0 + dot.tcx*2) * 0.1; // 10 / 10
       // dot.ty = (dot.tay*9 + dot.tmy*0 + dot.tcy+2) * 0.1; // 13 / 10
 
-      // dot.tx = (dot.tax*9 + dot.tmx*0 + dot.tcx*1) * 0.1; // 10 / 10
-      // dot.ty = (dot.tay*9 + dot.tmy*0 + dot.tcy+1) * 0.1; // 10 / 10
+      dot.tx = (dot.tox*9 + dot.tcx*1) * 0.1; // 10 / 10
+      dot.ty = (dot.toy*9 + dot.tcy+1) * 0.1; // 10 / 10
 
-      // seem only tm vs ta in terms of sliding stuff
-      // dot.tx = (dot.tax*1 + dot.tmx*4 + dot.tcx*5) * 0.1; // 10 / 10
-      // dot.ty = (dot.tay*6 + dot.tmy*3 + dot.tcy+1) * 0.1; // 10 / 10
     }
 
-    // targetMidPoint();
-    // targetCenterOfTriangle();
-    // targetAverageVectorAverageMagnitude();
+    targetMidPoint();
+    targetCenterOfTriangle();
+    targetAverageVectorAverageMagnitude();
     targetNearestPointOrthogonal();
     targetSomewhere();
 
