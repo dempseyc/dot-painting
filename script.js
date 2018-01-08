@@ -13,9 +13,9 @@ let squareNum = function (num) {
 };
 
 let allDots = [];
-let numD = 200; // make it an even number
+let numD = 300; // make it an even number
 let moveAmount = 0.2;
-let numMoves = 50;
+let numMoves = 40;
 
 class Dot {
 
@@ -23,11 +23,9 @@ class Dot {
     this.idx = id;
     this.xPos = xPos;
     this.yPos = yPos;
-    // NearestNeigbor
-    // NextNearestNeighbor
     this.tx = 0;
     this.ty = 0;
-    let newDot = $(`<div id= ${id} class= "dot green" >`).hover(this.onMouseIn, this.onMouseOut);
+    let newDot = $(`<div id= ${this.idx} class= "dot green" >`).hover(this.onMouseIn, this.onMouseOut);
     this.JQ = newDot;
     dotContainer.append(this.JQ);
   }
@@ -304,8 +302,8 @@ class Dot {
       // dot.tx = (dot.tax*8 + dot.tmx*0 + dot.tcx*2) * 0.1; // 10 / 10
       // dot.ty = (dot.tay*9 + dot.tmy*0 + dot.tcy+2) * 0.1; // 13 / 10
 
-      dot.tx = (dot.tox*9 + dot.tcx*1) * 0.1; // 10 / 10
-      dot.ty = (dot.toy*9 + dot.tcy+1) * 0.1; // 10 / 10
+      dot.tx = (dot.tox*18 + dot.tcx*1 + dot.tax*1) * 0.05; // 10 / 10
+      dot.ty = (dot.toy*18 + dot.tcy+1 + dot.tay*1) * 0.05; // 10 / 10
 
     }
 
@@ -400,6 +398,33 @@ class Painter {
 } // end class Painter
 
 let paintDots = new Painter(numD);
+
+class LayerPanel {
+
+  constructor (layerNumber) {
+    this.num = layerNumber;
+    this.buildJQ();
+  }
+
+  buildJQ () {
+    let parent = $('.ui-container');
+    let layerButtons = $('.layer-button-container');
+    let layerPanel = $(`<div class= "top-panel layer-panel layer-panel-${this.num}" ></div>`);
+    let layerButton = $(`<div class= "layer-button layer-button-${this.num}" >${this.num}</div>`);
+
+    let dotStylePanel = $(`<div class= "panel dot-style-panel" ></div>`);
+    let algoPanel = $(`<div class= "panel algo-panel" ></div>`);
+
+    layerPanel.append(dotStylePanel);
+    layerPanel.append(algoPanel);
+
+    layerButtons.append(layerButton);
+    parent.append(layerPanel);
+  }
+
+}
+
+let layerPanel1 = new LayerPanel(1);
 
 /////////////////////////////////////////////////////////////////////////////////////
 // function testIfAnyDotsHaveThemselvesAsNs () {
