@@ -4,6 +4,25 @@ let status = $('.status');
 let dotContainer = $('.dot-container');
 // status.text("has jquery");
 
+let dotStyles = [
+  {
+    idx: 0,
+    name: "yellowBlotch",
+    imgSrc: "./public/images/yellow-blotch.png"
+  },
+  {
+    idx: 1,
+    name: "cyanBlotch",
+    imgSrc: "./public/images/cyan-blotch.png"
+  },
+  {
+    idx: 2,
+    name: "magentaBlotch",
+    imgSrc: "./public/images/magenta-blotch.png"
+  }
+];
+
+
 let randomPos = function () {
   return Math.floor(Math.random()*100);
 };
@@ -399,32 +418,132 @@ class Painter {
 
 let paintDots = new Painter(numD);
 
+class ImageDropDown {
+  constructor (optionsArr,width,elHeight) {
+    this.options = optionsArr;
+    this.width = width;
+    this.height = elHeight;
+    this.expanded = false;
+    this.selected = this.options[0];
+    this.DD = $(`<div class= "DD" width= "${this.width}px" height= "${this.height}px" ></div>`);
+    this.buildDropDown();
+    this.collapse();
+    return this.DD;
+  }
+
+  buildDropDown() {
+    this.options.forEach((option, i) => {
+      let divI = $(`<div class= "DD-option" "DD-option-idx-${i}" ><img src= ${option.imgSrc} ></img></div>`);
+      this.DD.append(divI);
+    });
+  }
+
+  handleClick (e) {
+    // toggle expand/collapse
+    if (this.expanded = true) {
+      this.handleSelection(e);
+    } else {
+      this.expand();
+      this.expanded = true;
+    }
+  }
+
+  expand () {
+    // change overflow from hidden
+    this.height = elHeight * options.length;
+
+  }
+
+  collapse () {
+    // change overflow to hidden
+    this.DD.css({"overflow": "hidden"});
+  }
+
+  handleSelection (e) {
+    console.log("selection made");
+  }
+
+}
+
 class LayerPanel {
 
   constructor (layerNumber) {
     this.num = layerNumber;
-    this.buildJQ();
+    this.JQ = this.buildLayerPanel(); // stuff like that from here to heaven
   }
 
-  buildJQ () {
+  // not only build it, but return it to UI Panel which will store the necessary JQ elements
+  buildLayerPanel () {
+    let layerJQ = {};
     let parent = $('.ui-container');
     let layerButtons = $('.layer-button-container');
     let layerPanel = $(`<div class= "top-panel layer-panel layer-panel-${this.num}" ></div>`);
     let layerButton = $(`<div class= "layer-button layer-button-${this.num}" >${this.num}</div>`);
-
-    let dotStylePanel = $(`<div class= "panel dot-style-panel" ></div>`);
-    let algoPanel = $(`<div class= "panel algo-panel" ></div>`);
+    let dotStylePanel = this.buildDotStylePanel();
+    let algoPanel = this.buildAlgoPanel();
 
     layerPanel.append(dotStylePanel);
     layerPanel.append(algoPanel);
 
     layerButtons.append(layerButton);
     parent.append(layerPanel);
+
+    layerJQ.button = layerButton;
+    layerJQ.panel = layerPanel;
+    return layerJQ;
+  }
+
+  buildDotStylePanel () {
+    let DSP = $('<div class= "panel dot-style-panel" ></div>');
+    let dotBox = new ImageDropDown(dotStyles,120,120);
+    DSP.append(dotBox);
+    return DSP;
+  }
+
+  buildAlgoPanel () {
+    let AP = $(`<div class= "panel algo-panel" ></div>`);
+    return AP;
+  }
+
+  beSelected () {
+
+  }
+
+} // end LayerPanel class
+
+class UIPanel {
+
+  constructor (layersConfig) {
+    this.numLayers = layersConfig.numLayers;
+    this.buildLayerPanels();
+    this.selectLayerPanel(1);
+  }
+
+  buildLayerPanels () {
+    for (let i=1; i<=this.numLayers; i++) {
+      let layerPanel = new LayerPanel(i);
+    }
+  }
+
+  selectLayerPanel () {
+
+  }
+
+  addLayerPanel () {
+
+  }
+
+  rebuildLayerPanels () {
+
   }
 
 }
 
-let layerPanel1 = new LayerPanel(1);
+let config = {
+  numLayers: 3
+}
+
+let UI = new UIPanel(config);
 
 /////////////////////////////////////////////////////////////////////////////////////
 // function testIfAnyDotsHaveThemselvesAsNs () {

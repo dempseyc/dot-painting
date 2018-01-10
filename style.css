@@ -56,9 +56,17 @@ body {
 
 .layer-button {
   border: 2px solid #000;
-  border-bottom: none;
   background-color: #AAA;
 
+}
+
+.tab > .selected {
+  border-bottom: none;
+}
+
+.top-panel {
+  position: absolute;
+  width: 100%;
 }
 
 .layer-panel {
@@ -66,3 +74,21 @@ body {
   grid-template-columns: 1fr;
   grid-auto-rows: minmax(100px, auto);
 }
+
+.layer-panel .selected {
+  border-top: 4px solid #AAA;
+}
+
+.panel{
+  padding: 0 0.5em 0 0.5em;
+  border-bottom: 3px solid #999;
+}
+
+.DD {
+  overflow: hidden;
+}
+
+/*select#dot-style option[value="cyan-blotch"] { background-image:url("./public/images/cyan-blotch.png");   }
+select#dot-style option[value="magenta-blotch"] { background-image:url("./public/images/magenta-blotch.png"); }
+select#dot-style option[value="yellow-blotch"] { background-image:url("./public/images/yellow.png"); }*/
+
