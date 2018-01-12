@@ -393,7 +393,7 @@ class Painter {
       dot.JQ.css({"left": `${dot.xPos}%`});
       dot.JQ.css({"top": `${dot.yPos}%`});
     });
-    console.log(allDots);
+    // console.log(allDots);
     this.move();
   }
 
@@ -425,42 +425,56 @@ class ImageDropDown {
     this.height = elHeight;
     this.expanded = false;
     this.selected = this.options[0];
+    this.JQ = [];
     this.DD = $(`<div class= "DD" width= "${this.width}px" height= "${this.height}px" ></div>`);
     this.buildDropDown();
     this.collapse();
-    return this.DD;
+    return this;
   }
 
   buildDropDown() {
     this.options.forEach((option, i) => {
       let divI = $(`<div class= "DD-option" "DD-option-idx-${i}" ><img src= ${option.imgSrc} ></img></div>`);
+      let data = {dd: this, i:i};
+      divI.on("click", data, this.handleClick);
       this.DD.append(divI);
+      this.JQ.push(divI);
     });
   }
 
-  handleClick (e) {
-    // toggle expand/collapse
-    if (this.expanded = true) {
-      this.handleSelection(e);
+  handleClick (event) {
+    console.log(event.data.dd);
+    if (event.data.dd.expanded == true) {
+      event.data.dd.handleSelection(event.data.i);
     } else {
-      this.expand();
-      this.expanded = true;
+      event.data.dd.expanded = true;
+      event.data.dd.expand();
     }
+  }
+
+  handleSelection (option) {
+    console.log(option, "option");
+    this.selected = this.options[option];
+    this.collapse();
+    console.log("selection made", this);
   }
 
   expand () {
     // change overflow from hidden
-    this.height = elHeight * options.length;
+    this.JQ.forEach((o) => {
+      o.css({"display": "block"});
+    });
 
   }
 
   collapse () {
     // change overflow to hidden
-    this.DD.css({"overflow": "hidden"});
-  }
-
-  handleSelection (e) {
-    console.log("selection made");
+    let selection = this.JQ[this.selected.idx];
+    this.JQ.forEach((o) => {
+      o.css({"display": "none"});
+    });
+    selection.css({"display": "block"});
+    this.expanded = false;
   }
 
 }
@@ -468,35 +482,42 @@ class ImageDropDown {
 class LayerPanel {
 
   constructor (layerNumber) {
-    this.num = layerNumber;
-    this.JQ = this.buildLayerPanel(); // stuff like that from here to heaven
+    this.idx = layerNumber;
+    this.JQ = {};
+    this.buildLayerPanel();
+    this.buildLayerButton();
+    this.selected = false;
+    return this.JQ;
   }
 
-  // not only build it, but return it to UI Panel which will store the necessary JQ elements
   buildLayerPanel () {
-    let layerJQ = {};
-    let parent = $('.ui-container');
-    let layerButtons = $('.layer-button-container');
-    let layerPanel = $(`<div class= "top-panel layer-panel layer-panel-${this.num}" ></div>`);
-    let layerButton = $(`<div class= "layer-button layer-button-${this.num}" >${this.num}</div>`);
+    let UIContainer = $('.ui-container');
+    let layerPanel = $(`<div class= "top-panel layer-panel layer-panel-${this.idx}" ></div>`);
+    layerPanel.css({"display": "none"});
+
     let dotStylePanel = this.buildDotStylePanel();
     let algoPanel = this.buildAlgoPanel();
 
     layerPanel.append(dotStylePanel);
     layerPanel.append(algoPanel);
 
-    layerButtons.append(layerButton);
-    parent.append(layerPanel);
+    UIContainer.append(layerPanel);
+    let JQ = $(`.layer-panel-${this.idx}`);
+    this.JQ.panel = JQ;
+  }
 
-    layerJQ.button = layerButton;
-    layerJQ.panel = layerPanel;
-    return layerJQ;
+  buildLayerButton () {
+    let layerButtonContainer = $('.layer-button-container');
+    let layerButton = $(`<div class= "layer-button layer-button-${this.idx}" >${this.idx}</div>`);
+    layerButtonContainer.append(layerButton);
+    let JQ = $(`.layer-button-${this.idx}`);
+    this.JQ.button = JQ;
   }
 
   buildDotStylePanel () {
     let DSP = $('<div class= "panel dot-style-panel" ></div>');
     let dotBox = new ImageDropDown(dotStyles,120,120);
-    DSP.append(dotBox);
+    DSP.append(dotBox.DD);
     return DSP;
   }
 
@@ -505,36 +526,53 @@ class LayerPanel {
     return AP;
   }
 
-  beSelected () {
-
-  }
-
 } // end LayerPanel class
 
 class UIPanel {
 
   constructor (layersConfig) {
+    this.selection = 0;
     this.numLayers = layersConfig.numLayers;
-    this.buildLayerPanels();
-    this.selectLayerPanel(1);
+    this.layerPanelsJQ = [];
+    this.buildLayers();
+    this.attachClickToButtons();
+    this.setLayerSelection(this.selection);
   }
 
-  buildLayerPanels () {
-    for (let i=1; i<=this.numLayers; i++) {
-      let layerPanel = new LayerPanel(i);
+  buildLayers () {
+    for (let i=0; i<this.numLayers; i++) {
+      let layer = new LayerPanel(i);
+      this.layerPanelsJQ.push({panel: layer.panel, button: layer.button});
     }
+    console.log(this.layerPanelsJQ); // panel and button
   }
 
-  selectLayerPanel () {
+  attachClickToButtons () {
+    this.layerPanelsJQ.forEach((JQ, i) => {
+      let data = {num: i, obj: this};
+      JQ.button.on("click", data, function() {
+        data.obj.setLayerSelection(data.num);
+      });
+    });
+  }
 
+  setLayerSelection (idx) {
+    this.selection = idx;
+    this.layerPanelsJQ.forEach((layerJQ, i) => {
+      if (i === this.selection) {
+        layerJQ.panel.css({"display": "block"});
+        layerJQ.button.addClass('selected');
+        layerJQ.button.removeClass('not-selected');
+      } else {
+        layerJQ.panel.css({"display": "none"});
+        layerJQ.button.addClass('not-selected');
+        layerJQ.button.removeClass('selected');
+      }
+    });
   }
 
   addLayerPanel () {
-
-  }
-
-  rebuildLayerPanels () {
-
+    console.log("add layer and select new layer");
   }
 
 }

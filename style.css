@@ -54,14 +54,20 @@ body {
   background-color: #000;
 }
 
-.layer-button {
-  border: 2px solid #000;
+.layer-button.selected {
   background-color: #AAA;
-
+  border-top: 2px solid #000;
+  border-left: 2px solid #000;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #AAA;
 }
 
-.tab > .selected {
-  border-bottom: none;
+.layer-button.not-selected {
+  background-color: #AAA;
+  border-top: 2px solid #000;
+  border-left: 2px solid #000;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
 }
 
 .top-panel {
@@ -75,17 +81,16 @@ body {
   grid-auto-rows: minmax(100px, auto);
 }
 
-.layer-panel .selected {
-  border-top: 4px solid #AAA;
-}
-
 .panel{
   padding: 0 0.5em 0 0.5em;
   border-bottom: 3px solid #999;
 }
 
 .DD {
-  overflow: hidden;
+}
+
+.DD-option {
+  display: none;
 }
 
 /*select#dot-style option[value="cyan-blotch"] { background-image:url("./public/images/cyan-blotch.png");   }
