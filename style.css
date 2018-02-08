@@ -11,7 +11,7 @@ body {
   margin-top: 30px;
 }
 
-.dot-container {
+.display {
   background-color: #CCC;
   overflow: hidden;
   display: block;
@@ -22,8 +22,10 @@ body {
 
 .dot {
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 50px;
+  // right: 50px;
+  height: 50px;
+  // bottom: 50px;
   border-radius: 50%;
 }
 
@@ -35,7 +37,22 @@ body {
   background: #B00;
 }
 
-.ui-container {
+.yellow-blotch {
+
+}
+
+.blue-blotch {
+
+}
+
+.magenta-blotch {
+  background-size: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("./public/images/magenta-blotch.png");
+}
+
+.user-interface {
   background-color: #AAA;
   position: absolute;
   right: -50px;

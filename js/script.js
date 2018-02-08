@@ -1,28 +1,32 @@
 // based on one of my first programming experiences in 2011 with flash and as3 but now in JS and browser copyright Craig Dempsey
 
+// big JQ refs
 let status = $('.status');
-let dotContainer = $('.dot-container');
-// status.text("has jquery");
+let dotPainting = $('.display');
+let userInterface = $('.user-interface');
 
+//// data and function utilities
+
+// could be replaced with a dotStyle generator
 let dotStyles = [
   {
     idx: 0,
-    name: "yellowBlotch",
+    name: "yellow-blotch",
     imgSrc: "./public/images/yellow-blotch.png"
   },
   {
     idx: 1,
-    name: "cyanBlotch",
+    name: "cyan-blotch",
     imgSrc: "./public/images/cyan-blotch.png"
   },
   {
     idx: 2,
-    name: "magentaBlotch",
+    name: "magenta-blotch",
     imgSrc: "./public/images/magenta-blotch.png"
   }
 ];
 
-
+// utils
 let randomPos = function () {
   return Math.floor(Math.random()*100);
 };
@@ -31,44 +35,55 @@ let squareNum = function (num) {
   return Math.pow(num, 2);
 };
 
+// external vars
+
 let allDots = [];
 let numD = 300; // make it an even number
 let moveAmount = 0.2;
 let numMoves = 40;
 
-class Dot {
+// class 'modules'
 
-  constructor( id, xPos, yPos ) {
+class DotHandle {
+
+}
+
+class Dot {
+  // NN
+  // NNN
+
+  constructor( id, xPos, yPos, style ) {
     this.idx = id;
     this.xPos = xPos;
     this.yPos = yPos;
     this.tx = 0;
     this.ty = 0;
-    let newDot = $(`<div id= ${this.idx} class= "dot green" >`).hover(this.onMouseIn, this.onMouseOut);
+    let newDot = $(`<div id= ${this.idx} class= "${style}" >`).hover(this.onMouseIn, this.onMouseOut);
     this.JQ = newDot;
-    dotContainer.append(this.JQ);
+    dotPainting.append(this.JQ);
   }
 
-  onMouseIn () {
-    // console.log(this.id); // returns dom object, not a Dot
-    // console.log("mousein");
-    allDots[this.id].NN.JQ.removeClass('green');
-    allDots[this.id].NN.JQ.addClass('red');
-    allDots[this.id].NNN.JQ.removeClass('green');
-    allDots[this.id].NNN.JQ.addClass('red');
-  }
+  // onMouseIn () {
+  //   // console.log(this.id); // returns dom object, not a Dot
+  //   // console.log("mousein");
+  //   allDots[this.id].NN.JQ.removeClass('green');
+  //   allDots[this.id].NN.JQ.addClass('red');
+  //   allDots[this.id].NNN.JQ.removeClass('green');
+  //   allDots[this.id].NNN.JQ.addClass('red');
+  // }
 
-  onMouseOut () {
-    // console.log("mouseout");
-    allDots[this.id].NN.JQ.removeClass('red');
-    allDots[this.id].NN.JQ.addClass('green');
-    allDots[this.id].NNN.JQ.removeClass('red');
-    allDots[this.id].NNN.JQ.addClass('green');
-  }
+  // onMouseOut () {
+  //   // console.log("mouseout");
+  //   allDots[this.id].NN.JQ.removeClass('red');
+  //   allDots[this.id].NN.JQ.addClass('green');
+  //   allDots[this.id].NNN.JQ.removeClass('red');
+  //   allDots[this.id].NNN.JQ.addClass('green');
+  // }
 
   // find Neighbors
   findNs () {
-    // take allDots array and fill in this.NN and this.NNN
+    // take allDots array and fill in this.NN and this.NNN 
+    // 20164 is based on square root of 2 times 100
     let NNDistanceSqrd = 20164;
     let NNNDistanceSqrd = 20164;
 
@@ -355,8 +370,9 @@ class DotMaker {
     let x = randomPos();
     let reflectedx = 100 - x;
     let y = randomPos();
-    let dot = new Dot(id,x,y);
-    let dotTwin = new Dot(id2,reflectedx,y);
+    let style = "dot magenta-blotch";
+    let dot = new Dot(id,x,y,style);
+    let dotTwin = new Dot(id2,reflectedx,y,style);
     allDots.push(dot);
     allDots.push(dotTwin);
   }
@@ -491,7 +507,7 @@ class LayerPanel {
   }
 
   buildLayerPanel () {
-    let UIContainer = $('.ui-container');
+    let UIContainer = $('.user-interface');
     let layerPanel = $(`<div class= "top-panel layer-panel layer-panel-${this.idx}" ></div>`);
     layerPanel.css({"display": "none"});
 
@@ -591,6 +607,5 @@ let UI = new UIPanel(config);
 //     }
 //   });
 // }
-
 // testIfAnyDotsHaveThemselvesAsNs();
 /////////////////////////////////////////////////////////////////////////////////////
